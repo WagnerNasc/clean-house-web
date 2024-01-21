@@ -23,24 +23,23 @@ export function Customers() {
     setSearchValue(data);
   };
 
+  const fetchCustomerList = async () => {
+    try {
+      const url = searchValue
+        ? `http://localhost:3000/customers?filter=${searchValue}`
+        : "http://localhost:3000/customers";
+
+      const response = await fetch(url);
+      const data: ApiResponse = await response.json();
+
+      setCustomerData(data);
+    } catch (error) {
+      console.error("Error fetching customer data:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const url = searchValue
-          ? `http://localhost:3000/customers?filter=${searchValue}`
-          : "http://localhost:3000/customers";
-
-        const response = await fetch(url);
-        const data: ApiResponse = await response.json();
-        console.log(data);
-        
-        setCustomerData(data);
-      } catch (error) {
-        console.error("Error fetching customer data:", error);
-      }
-    };
-
-    fetchData();
+    fetchCustomerList();
   }, [searchValue]);
 
   return (

@@ -2,6 +2,7 @@ import { ThemeProvider } from "styled-components"
 import { defaultTheme } from "./styles/themes/default"
 import { GlobalStyle } from "./styles/global"
 import { Customers } from "./pages/Customers"
+import { ToastContainer } from 'react-toastify';
 
 export function App() {
   
@@ -9,6 +10,7 @@ export function App() {
     <ThemeProvider theme={defaultTheme}>
       <GlobalStyle/>
         <Customers/>
+        <ToastContainer />
     </ThemeProvider>
   )
 }
