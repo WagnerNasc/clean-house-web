@@ -1,60 +1,52 @@
-import { Controller, SubmitHandler, useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import * as Dialog from '@radix-ui/react-dialog';
 import { X, User } from 'phosphor-react';
 import { CloseButton, Content, Overlay, Title } from './styles';
+
+import * as z from 'zod';
+import { zodResolver } from '@hookform/resolvers/zod'
 import { isValidEmail } from '../../utils/emailValidator';
-import { toast } from 'react-toastify';
+import { CustomersContext } from '../../contexts/CustomerContext';
+import { useContext } from 'react';
 
+const createCustomerFormSchema = z.object({
+  name: z.string(),
+  email: z.string().email(),
+  phone: z.string(),
+  street: z.string(),
+  number: z.string(),
+  neighborhood: z.string(),
+  city: z.string(),
+  state: z.string(),
+  postalCode: z.string(),
+  latitude: z.number(),
+  longitude: z.number(),
+})
 
-interface CustomerAddressFormData {
-  name: string
-  email: string
-  phone: string
-  street: string
-  number: string
-  neighborhood: string
-  city: string
-  state: string
-  postalCode: string
-  latitude: number
-  longitude: number
-}
+type CreateCustomerFormInputs = z.infer<typeof createCustomerFormSchema>
 
 export function CreateCustomerAddress({ afterSave }: { afterSave: () => void }) {
+  const { createCustomer  } = useContext(CustomersContext);
+  
   const { 
     register, 
-    handleSubmit, 
-    control, 
-    reset, 
+    handleSubmit,
+    control,
+    reset,
     formState: { errors, isSubmitting } 
-  } = useForm<CustomerAddressFormData>(); 
+  } = useForm<CreateCustomerFormInputs>({
+    resolver: zodResolver(createCustomerFormSchema)
+  });
 
-  const onSubmit: SubmitHandler<CustomerAddressFormData> = async (data) => {
-    console.log('aquiii!!!');
-    try {
-      
-      const response = await fetch("http://localhost:3000/customer-address", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
+  const handleCreateCustomer = async (data: CreateCustomerFormInputs) => {
+    const { name, email, phone, street, number, neighborhood, city, state, postalCode, latitude, longitude } = data;
 
-      if (response.status === 409) {
-        toast.error("O e-mail ja existe.");
-        return;
-      }
-      
-      reset();
-      afterSave();
-
-      toast.success("Cliente criado com sucesso!");
-    } catch (error) {
-      console.error("Error submitting form data:", error);
-      toast.error("Erro ao criar cliente. Tente novamente.");
-    }
-  };
+    await createCustomer({
+      name, email, phone, street, number, neighborhood, city, state, postalCode, latitude, longitude
+    })
+    reset();
+    afterSave();
+  }
 
   return (
     <Dialog.Portal>
@@ -67,10 +59,14 @@ export function CreateCustomerAddress({ afterSave }: { afterSave: () => void }) 
             <X size={24}/>
           </CloseButton>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <input type="text" placeholder='Nome' {...register('name', { required: true })} />
-            {errors.name && <span>Nome é obrigatório</span>}
-
+          <form onSubmit={handleSubmit(handleCreateCustomer)}>
+            <input 
+              type="text" 
+              placeholder='Nome' 
+              {...register('name')}
+            />
+            {errors.name && errors.name.type === 'required' && <span>Nome é obrigatório</span>}
+ 
             <Controller
               render={({ field }) => (
                 <input 
@@ -134,7 +130,7 @@ export function CreateCustomerAddress({ afterSave }: { afterSave: () => void }) 
               {...register('state', 
               { required: true })} 
             />
-            {errors.city && <span>Estado é obrigatória</span>}
+            {errors.state && <span>Estado é obrigatória</span>}
 
             <input 
               type="text" 
@@ -142,25 +138,27 @@ export function CreateCustomerAddress({ afterSave }: { afterSave: () => void }) 
               {...register('postalCode', 
               { required: true })} 
             />
-            {errors.city && <span>CEP é obrigatória</span>}
+            {errors.postalCode && <span>CEP é obrigatória</span>}
 
             <input 
               type="text" 
               placeholder='Latitude' 
               {...register('latitude', 
-              { pattern: /^-?\d+(\.\d+)?$/, required: true })} 
+              { valueAsNumber: true, required: true })} 
             />
-            {errors.city && <span>Latitude deve ser um número válido</span>}
+            {errors.latitude && <span>Latitude deve ser um número válido</span>}
 
             <input 
               type="text" 
               placeholder='Longitude' 
               {...register('longitude', 
-              { pattern: /^-?\d+(\.\d+)?$/, required: true })} 
+              { valueAsNumber: true, required: true })} 
             />
-            {errors.city && <span>Longitude deve ser um número válido</span>}
+            {errors.longitude && <span>Longitude deve ser um número válido</span>}
 
-            <button type="submit" disabled={isSubmitting}>Criar</button>
+            <button type="submit" disabled={isSubmitting}>
+                Criar
+            </button>
           </form>
         </Content>
     </Dialog.Portal>

@@ -4,7 +4,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { CreateCustomerButton, SearchCustomerForm } from "./styles";
 import { debounce } from "lodash";
 import { PlusCircle } from "phosphor-react";
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 interface SearchFormProps {
   onSearchChange: (value: string) => void;
@@ -13,7 +13,7 @@ interface SearchFormProps {
 export function SearchCustomer({ onSearchChange  }: SearchFormProps) {
   const [open, setOpen] = useState(false);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     onSearchChange(e.target.value);
   };
 

@@ -46,13 +46,15 @@ export function OrderlyService() {
         <CustomersTable>
           <table>
             <thead>
-              <th key="name">Nome</th>
-              <th key="phone">Telefone</th>
-              <th key="email">Email</th>
-              <th key="street">Logradouro</th>
-              <th key="number">Numero</th>
-              <th key="neighborhood">Bairro</th>
-              <th key="city">Cidade</th>
+              <tr>
+                <th key="name">Nome</th>
+                <th key="phone">Telefone</th>
+                <th key="email">Email</th>
+                <th key="street">Logradouro</th>
+                <th key="number">Numero</th>
+                <th key="neighborhood">Bairro</th>
+                <th key="city">Cidade</th>
+              </tr>
             </thead>
             <tbody>
               {customerData?.map((customer) => (
